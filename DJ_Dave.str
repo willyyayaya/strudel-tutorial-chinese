@@ -1,0 +1,41 @@
+// load sample pack...
+samples({
+  build_bass:  ['snd/bass/build_0.mp3', 'snd/bass/build_1.mp3', 'snd/bass/build_2.mp3', 'snd/bass/build_3.mp3'],
+  build_synth: ['snd/synth/build_0.mp3','snd/synth/build_1.mp3','snd/synth/build_2.mp3','snd/synth/build_3.mp3'],
+  build_vox:   ['snd/vox/build_0.mp3',  'snd/vox/build_1.mp3',  'snd/vox/build_2.mp3',  'snd/vox/build_3.mp3'],
+  drop_vox:    ['snd/vox/drop_0.mp3',   'snd/vox/drop_1.mp3',   'snd/vox/drop_2.mp3',   'snd/vox/drop_3.mp3',
+                'snd/vox/drop_4.mp3',   'snd/vox/drop_5.mp3',   'snd/vox/drop_6.mp3',   'snd/vox/drop_7.mp3',
+                'snd/vox/drop_8.mp3'],
+  verse_vox:   ['snd/vox/verse_0.mp3',  'snd/vox/verse_1.mp3',  'snd/vox/verse_2.mp3',  'snd/vox/verse_3.mp3',
+                'snd/vox/verse_4.mp3',  'snd/vox/verse_5.mp3',  'snd/vox/verse_6.mp3',  'snd/vox/verse_7.mp3',
+                'snd/vox/verse_8.mp3'],
+  sub:    ['snd/bass/sub_0.mp3',  'snd/bass/sub_1.mp3',  'snd/bass/sub_2.mp3'],
+  bass:   ['snd/bass/bass_0.mp3', 'snd/bass/bass_1.mp3', 'snd/bass/bass_2.mp3'],
+  kick:    'snd/perc/kick.mp3',
+  sn:      'snd/perc/sn.mp3',
+  cp:     ['snd/perc/cp.mp3', 'snd/perc/cp2.mp3'],
+  tom:     'snd/perc/tom.mp3',
+  hc:      'snd/perc/hc.mp3',
+  shaker:  'snd/perc/shaker.mp3',
+  break:   'snd/perc/break.mp3',
+  guitar: ['snd/perc/guit1.mp3', 'snd/perc/guit2.mp3'],
+}, 'github:lil-data/dj_dave-array_remix/main/');
+
+// hack: https://github.com/tidalcycles/strudel/issues/119
+const loopAx = register('loopAx', 
+  (l, pat) => pat.loopAt(l).chop(l*8).legato(1).mul(speed(0.99))
+);
+const setbpm = t => setcps(t/4/60)
+
+setbpm(160)
+
+// 輕快鋼琴+小提琴對話
+let piano = n("<0 4 7 9 12 9 7 4 0 2 4 5 7 9 7 5>").s("piano").loopAx(8).gain(0.7)
+let violin = n("<7 9 12 14 16 14 12 9 7 5 4 2 0 2 4>").s("violin").loopAx(8).gain(0.6)
+
+arrange(
+  [16, stack(piano, violin)]
+).fontFamily("x3270")
+  .theme("[gruvboxDark materialDark nord]")
+  .color("[aquamarine dodgerblue hotpink blueviolet deeppink]")
+  .punchcard({fold:1,flipTime:1,vertical:1})

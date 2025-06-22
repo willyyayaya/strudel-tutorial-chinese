@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "@strudel/core": "^1.2.2",
+    "@strudel/draw": "^1.2.2",
+    "@strudel/mini": "^1.2.2",
+    "@strudel/tonal": "^1.2.2",
+    "@strudel/web": "^1.2.3",
+    "@strudel/webaudio": "^1.2.3",
+    "hs2js": "^0.0.4",
+    "strudel": "^1.0.5"
+  }
+}
