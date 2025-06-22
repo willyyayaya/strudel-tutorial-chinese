@@ -447,7 +447,9 @@ stack(
         try {
           hush(); // 先停止之前的音樂
           setTimeout(() => {
-            evaluate(code);
+            // 移除 .play() 因為 evaluate 會自動播放
+            const cleanCode = code.replace('.play()', '');
+            evaluate(cleanCode);
           }, 100);
         } catch (error) {
           alert('播放錯誤：' + error.message);
