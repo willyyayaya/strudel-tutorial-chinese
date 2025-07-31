@@ -253,7 +253,18 @@
               <h4>疊加聲部</h4>
               <div class="code-block">stack(s("bd*2"), s("hh*4"))</div>
               <p>同時播放多個 pattern</p>
-              <button class="btn btn-primary" onclick="playExample('stack(s(&quot;bd*2&quot;), s(&quot;hh*4&quot;)).play()')">試聽</button>
+              <button class="btn btn-primary" onclick="playExample('stack(s(&quot;bd*2&quot;), s(&quot;hh*4&quot;))')">試聽</button>
+            </div>
+            <div class="example-card" style="grid-column: 1 / -1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-left: 4px solid #ffd700;">
+              <h4>🎵 完整音樂範例：Dub 風格</h4>
+              <div class="code-block" style="background: rgba(0,0,0,0.3); color: #fff;">stack(
+  note("[~ [&lt;[d3,a3,f4]!2 [d3,bb3,g4]!2&gt; ~]]*2").sound("gm_electric_guitar_muted").delay(.5),
+  sound("bd rim").bank("RolandTR707").delay(.5),
+  n("&lt;4 [3@3 4] [&lt;2 0&gt; ~@16] ~&gt;").scale("D4:minor").sound("gm_accordion:2").room(2),
+  n("[0 [~ 0] 4 [3 2] [0 ~] [0 ~] &lt;0 2&gt; ~]/2").scale("D2:minor").sound("sawtooth,triangle").lpf(800)
+)</div>
+              <p>四聲部編排：電吉他 + 鼓組 + 手風琴 + 貝斯，展現 Dub 音樂的經典特色</p>
+              <button class="btn" style="background: #ffd700; color: #333;" onclick="playCompleteExample()">🎧 播放完整範例</button>
             </div>
           </div>
         </div>
@@ -323,29 +334,74 @@
           <h3>✨ 效果器</h3>
           <div class="example-grid">
             <div class="example-card">
-              <h4>音量控制</h4>
-              <div class="code-block">.gain(0.5)</div>
-              <p>調整音量 (0-1)</p>
-              <button class="btn btn-primary" onclick="playExample('s(&quot;bd*4&quot;).gain(0.3).play()')">試聽</button>
+              <h4>低通濾波 (LPF)</h4>
+              <div class="code-block">note("c2 c3 c2 c3").s("sawtooth").lpf(800)</div>
+              <p>過濾高頻，數值越小聲音越悶。試試 200 vs 2000</p>
+              <button class="btn btn-primary" onclick="playExample('note(&quot;c2 c3 c2 c3&quot;).s(&quot;sawtooth&quot;).lpf(800)')">試聽</button>
             </div>
             <div class="example-card">
-              <h4>空間感</h4>
-              <div class="code-block">.room(0.8)</div>
-              <p>增加殘響效果</p>
-              <button class="btn btn-primary" onclick="playExample('s(&quot;bd sd&quot;).room(0.8).play()')">試聽</button>
+              <h4>動態音量 (Gain)</h4>
+              <div class="code-block">s("hh*16").gain("[.25 1]*2")</div>
+              <p>節奏的靈魂！動態音量創造律動感</p>
+              <button class="btn btn-primary" onclick="playExample('s(&quot;hh*16&quot;).gain(&quot;[.25 1]*2&quot;)')">試聽</button>
             </div>
             <div class="example-card">
-              <h4>延遲效果</h4>
-              <div class="code-block">.delay(0.25)</div>
-              <p>增加回音延遲</p>
-              <button class="btn btn-primary" onclick="playExample('s(&quot;bd sd&quot;).delay(0.25).play()')">試聽</button>
+              <h4>母音濾波 (Vowel)</h4>
+              <div class="code-block">note("c3 eb3 g3").s("sawtooth").vowel("a e i o")</div>
+              <p>模擬人聲母音，創造有機感</p>
+              <button class="btn btn-primary" onclick="playExample('note(&quot;c3 eb3 g3&quot;).s(&quot;sawtooth&quot;).vowel(&quot;a e i o&quot;)')">試聽</button>
             </div>
             <div class="example-card">
-              <h4>低通濾波</h4>
-              <div class="code-block">.lpf(800)</div>
-              <p>過濾高頻，讓聲音更溫暖</p>
-              <button class="btn btn-primary" onclick="playExample('s(&quot;bd sd hh*4&quot;).lpf(800).play()')">試聽</button>
+              <h4>延遲效果 (Delay)</h4>
+              <div class="code-block">s("bd rim").delay(".5:.125:.8")</div>
+              <p>格式：音量:時間:回授。創造回音效果</p>
+              <button class="btn btn-primary" onclick="playExample('s(&quot;bd rim&quot;).delay(&quot;.5:.125:.8&quot;)')">試聽</button>
             </div>
+            <div class="example-card">
+              <h4>空間殘響 (Room)</h4>
+              <div class="code-block">note("c4 eb4 g4").s("piano").room(2)</div>
+              <p>模擬空間感，數值越大空間越大</p>
+              <button class="btn btn-primary" onclick="playExample('note(&quot;c4 eb4 g4&quot;).s(&quot;piano&quot;).room(2)')">試聽</button>
+            </div>
+            <div class="example-card">
+              <h4>聲道平移 (Pan)</h4>
+              <div class="code-block">s("bd rim bd cp").pan("0 0.3 .6 1")</div>
+              <p>0=左聲道，1=右聲道，0.5=中間</p>
+              <button class="btn btn-primary" onclick="playExample('s(&quot;bd rim bd cp&quot;).pan(&quot;0 0.3 .6 1&quot;)')">試聽</button>
+            </div>
+            <div class="example-card">
+              <h4>播放速度 (Speed)</h4>
+              <div class="code-block">s("bd rim bd cp").speed("1 2 -1 -2")</div>
+              <p>負數=倒播，2=雙倍速，0.5=半速</p>
+              <button class="btn btn-primary" onclick="playExample('s(&quot;bd rim bd cp&quot;).speed(&quot;1 2 -1 -2&quot;)')">試聽</button>
+            </div>
+            <div class="example-card">
+              <h4>ADSR 包絡</h4>
+              <div class="code-block">note("c3").s("sawtooth").adsr(".1:.1:.5:.2")</div>
+              <p>格式：起音:衰減:延音:釋音</p>
+              <button class="btn btn-primary" onclick="playExample('note(&quot;c3 bb2 f3 eb3&quot;).s(&quot;sawtooth&quot;).adsr(&quot;.1:.1:.5:.2&quot;)')">試聽</button>
+            </div>
+            <div class="example-card">
+              <h4>波形調制 (Signals)</h4>
+              <div class="code-block">s("hh*16").lpf(sine.range(500, 2000))</div>
+              <p>用 sine, saw, square, tri 波形調制參數</p>
+              <button class="btn btn-primary" onclick="playExample('s(&quot;hh*16&quot;).lpf(sine.range(500, 2000))')">試聽</button>
+            </div>
+          </div>
+          
+          <div style="margin-top: 30px; padding: 20px; background: #f0f4f8; border-radius: 10px;">
+            <h4>🌊 進階：波形調制技巧</h4>
+            <p>Strudel 支援用波形來自動控制效果器參數：</p>
+            <ul style="margin: 15px 0; padding-left: 20px;">
+              <li><strong>sine</strong> - 正弦波，平滑變化</li>
+              <li><strong>saw</strong> - 鋸齒波，線性上升</li>
+              <li><strong>square</strong> - 方波，突然跳躍</li>
+              <li><strong>tri</strong> - 三角波，線性上下</li>
+              <li><strong>rand</strong> - 隨機值</li>
+              <li><strong>perlin</strong> - 平滑隨機</li>
+            </ul>
+            <div class="code-block">note("c2 c3").s("sawtooth").lpf(sine.range(100, 2000).slow(4))</div>
+            <button class="btn btn-secondary" onclick="playExample('note(&quot;c2 c3 c2 c3&quot;).s(&quot;sawtooth&quot;).lpf(sine.range(100, 2000).slow(4))')">試聽波形調制</button>
           </div>
         </div>
       </div>
@@ -362,11 +418,30 @@ stack(
   s('bd*2 sd*2'),
   s('hh*8'),
   note('c4 e4 g4 b4').s('piano')
-)">// 試試看這個範例
+)">// 完整 Dub 音樂範例 (來自官方教學)
 stack(
-  s("bd*2 sd*2"),
-  s("hh*8").gain(0.4),
-  note("c4 e4 g4 b4").s("piano").gain(0.6)
+  // 悶音電吉他配延遲
+  note("[~ [<[d3,a3,f4]!2 [d3,bb3,g4]!2> ~]]*2")
+    .sound("gm_electric_guitar_muted")
+    .delay(.5),
+  
+  // 經典鼓組節奏配延遲
+  sound("bd rim")
+    .bank("RolandTR707")
+    .delay(.5),
+  
+  // 手風琴主旋律配空間感
+  n("<4 [3@3 4] [<2 0> ~@16] ~>")
+    .scale("D4:minor")
+    .sound("gm_accordion:2")
+    .room(2)
+    .gain(.4),
+  
+  // 雙波形貝斯配低通濾波
+  n("[0 [~ 0] 4 [3 2] [0 ~] [0 ~] <0 2> ~]/2")
+    .scale("D2:minor")
+    .sound("sawtooth,triangle")
+    .lpf(800)
 )</textarea>
         </div>
 
@@ -459,6 +534,36 @@ stack(
       // 清空編輯器
       function clearEditor() {
         document.getElementById('custom-editor').value = '';
+      }
+      
+      // 播放完整 Dub 範例
+      function playCompleteExample() {
+        try {
+          hush(); // 先停止之前的音樂
+          setTimeout(() => {
+            evaluate(`
+              stack(
+                note("[~ [<[d3,a3,f4]!2 [d3,bb3,g4]!2> ~]]*2")
+                  .sound("gm_electric_guitar_muted")
+                  .delay(.5),
+                sound("bd rim")
+                  .bank("RolandTR707")
+                  .delay(.5),
+                n("<4 [3@3 4] [<2 0> ~@16] ~>")
+                  .scale("D4:minor")
+                  .sound("gm_accordion:2")
+                  .room(2)
+                  .gain(.4),
+                n("[0 [~ 0] 4 [3 2] [0 ~] [0 ~] <0 2> ~]/2")
+                  .scale("D2:minor")
+                  .sound("sawtooth,triangle")
+                  .lpf(800)
+              )
+            `);
+          }, 100);
+        } catch (error) {
+          alert('播放錯誤：' + error.message);
+        }
       }
     </script>
   </body>
