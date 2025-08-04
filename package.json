@@ -1,4 +1,26 @@
 {
+  "name": "strudel-tutorial-zh",
+  "version": "1.0.0",
+  "description": "Strudel 中文教學網站 - 用程式碼寫音樂，探索 Live Coding 的魅力",
+  "main": "vue-demo.html",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'No build needed for CDN version'",
+    "serve": "npx serve .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "strudel",
+    "live-coding",
+    "music",
+    "education",
+    "vue",
+    "javascript",
+    "tutorial",
+    "chinese"
+  ],
+  "author": "Strudel 中文教學團隊",
+  "license": "MIT",
   "dependencies": {
     "@strudel/core": "^1.2.2",
     "@strudel/draw": "^1.2.2",
@@ -8,5 +30,16 @@
     "@strudel/webaudio": "^1.2.3",
     "hs2js": "^0.0.4",
     "strudel": "^1.0.5"
-  }
+  },
+  "devDependencies": {
+    "serve": "^14.2.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/你的用戶名/strudel-tutorial-zh.git"
+  },
+  "bugs": {
+    "url": "https://github.com/你的用戶名/strudel-tutorial-zh/issues"
+  },
+  "homepage": "https://github.com/你的用戶名/strudel-tutorial-zh#readme"
 }

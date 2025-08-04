@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Strudel 中文教學 - 用程式碼寫音樂 (Vue版)</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/@strudel/web@1.0.3"></script>
+    <script src="https://unpkg.com/@strudel/repl@latest"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+      
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      
+      header {
+        text-align: center;
+        color: white;
+        margin-bottom: 40px;
+      }
+      
+      h1 {
+        font-size: 3em;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      }
+      
+      .subtitle {
+        font-size: 1.2em;
+        opacity: 0.9;
+      }
+      
+      .section {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      }
+      
+      .section h2 {
+        color: #5a67d8;
+        margin-bottom: 20px;
+        border-bottom: 3px solid #e2e8f0;
+        padding-bottom: 10px;
+      }
+      
+      .tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+      
+      .tab {
+        padding: 10px 20px;
+        background: #e2e8f0;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      
+      .tab.active {
+        background: #5a67d8;
+        color: white;
+      }
+      
+      .tab:hover {
+        background: #cbd5e0;
+      }
+      
+      .tab.active:hover {
+        background: #4c51bf;
+      }
+      
+      .tab-content {
+        display: none;
+      }
+      
+      .tab-content.active {
+        display: block;
+        animation: fadeIn 0.3s ease-in;
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      .example-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+      
+      .example-card {
+        background: #f7fafc;
+        border-radius: 10px;
+        padding: 20px;
+        border-left: 4px solid #5a67d8;
+        transition: all 0.3s;
+      }
+      
+      .example-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      }
+      
+      .example-card h4 {
+        color: #2d3748;
+        margin-bottom: 10px;
+      }
+      
+      .code-block {
+        background: #2d3748;
+        color: #e2e8f0;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 10px 0;
+        font-family: 'Courier New', monospace;
+        overflow-x: auto;
+        font-size: 14px;
+      }
+      
+      .controls {
+        display: flex;
+        gap: 10px;
+        margin: 20px 0;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+      }
+      
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      
+      .btn-primary {
+        background: #5a67d8;
+        color: white;
+      }
+      
+      .btn-primary:hover:not(:disabled) {
+        background: #4c51bf;
+        transform: translateY(-2px);
+      }
+      
+      .btn-secondary {
+        background: #e2e8f0;
+        color: #2d3748;
+      }
+      
+      .btn-secondary:hover:not(:disabled) {
+        background: #cbd5e0;
+      }
+      
+      .btn-success {
+        background: #48bb78;
+        color: white;
+      }
+      
+      .btn-success:hover:not(:disabled) {
+        background: #38a169;
+      }
+      
+      .editor-area {
+        background: #2d3748;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+      
+      .custom-editor {
+        width: 100%;
+        height: 300px;
+        background: #1a202c;
+        color: #e2e8f0;
+        border: none;
+        border-radius: 8px;
+        padding: 15px;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        resize: vertical;
+      }
+      
+      .sound-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+      }
+      
+      .sound-card {
+        background: #f7fafc;
+        border-radius: 8px;
+        padding: 15px;
+        text-align: center;
+        border: 2px solid transparent;
+        transition: all 0.3s;
+      }
+      
+      .sound-card:hover {
+        border-color: #5a67d8;
+        transform: translateY(-2px);
+      }
+      
+      .iframe-container {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+        text-align: center;
+      }
+      
+      .iframe-container iframe {
+        border-radius: 10px;
+        border: 2px solid #e2e8f0;
+        width: 100%;
+        height: 400px;
+      }
+      
+      .special-card {
+        grid-column: 1 / -1;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-left: 4px solid #ffd700;
+      }
+      
+      .special-card .code-block {
+        background: rgba(0,0,0,0.3);
+        color: #fff;
+      }
+      
+      .special-card .btn {
+        background: #ffd700;
+        color: #333;
+      }
+      
+      .special-card .btn:hover {
+        background: #f6e05e;
+      }
+      
+      .advanced-section {
+        margin-top: 30px;
+        padding: 20px;
+        background: #f0f4f8;
+        border-radius: 10px;
+      }
+      
+      .status-indicator {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-left: 10px;
+        animation: pulse 2s infinite;
+      }
+      
+      .status-playing {
+        background: #48bb78;
+      }
+      
+      .status-stopped {
+        background: #e53e3e;
+      }
+      
+      @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+      }
+      
+      .loading {
+        opacity: 0.6;
+        pointer-events: none;
+      }
+      
+      @media (max-width: 768px) {
+        .example-grid {
+          grid-template-columns: 1fr;
+        }
+        
+        .tabs {
+          flex-direction: column;
+        }
+        
+        .tab {
+          text-align: center;
+        }
+        
+        h1 {
+          font-size: 2em;
+        }
+        
+        .controls {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div class="container">
+        <!-- Header -->
+        <header>
+          <h1>🎵 Strudel 中文教學</h1>
+          <p class="subtitle">用程式碼寫音樂，探索 Live Coding 的魅力</p>
+          <div class="status-indicator" :class="isPlaying ? 'status-playing' : 'status-stopped'"></div>
+        </header>
+
+        <!-- 原始作品展示 -->
+        <div class="iframe-container">
+          <h3>🌊 經典作品：Coastline by eddyflux</h3>
+          <p>這是一個經典的 Strudel 作品，展現了 live coding 音樂的魅力</p>
+          <iframe src="https://strudel.cc/#Ly8gImNvYXN0bGluZSIgQGJ5IGVkZHlmbHV4Ci8vIEB2ZXJzaW9uIDEuMApzYW1wbGVzKCdnaXRodWI6ZWRkeWZsdXgvY3JhdGUnKQpzZXRjcHMoLjc1KQpsZXQgY2hvcmRzID0gY2hvcmQoIjxCYm05IEZtOT4vNCIpLmRpY3QoJ2lyZWFsJykKc3RhY2soCiAgc3RhY2soIC8vIERSVU1TCiAgICBzKCJiZCIpLnN0cnVjdCgiPFt4KjwxIDI%2BIFt%2BQDMgeF1dIHg%2BIiksCiAgICBzKCJ%2BIFtyaW0sIHNkOjwyIDM%2BXSIpLnJvb20oIjwwIC4yPiIpLAogICAgbigiWzAgPDEgMz5dKjwyITMgND4iKS5zKCJoaCIpLAogICAgcygicmQ6PDEhMyAyPioyIikubWFzaygiPDAgMCAxIDE%2BLzE2IikuZ2FpbiguNSkKICApLmJhbmsoJ2NyYXRlJykKICAubWFzaygiPFswIDFdIDEgMSAxPi8xNiIuZWFybHkoLjUpKQogICwgLy8gQ0hPUkRTCiAgY2hvcmRzLm9mZnNldCgtMSkudm9pY2luZygpLnMoImdtX2VwaWFubzE6MSIpCiAgLnBoYXNlcig0KS5yb29tKC41KQogICwgLy8gTUVMT0RZCiAgbigiPDAhMyAxKjI%2BIikuc2V0KGNob3JkcykubW9kZSgicm9vdDpnMiIpCiAgLnZvaWNpbmcoKS5zKCJnbV9hY291c3RpY19iYXNzIiksCiAgY2hvcmRzLm4oIlswIDw0IDMgPDIgNT4%2BKjJdKDwzIDU%2BLDgpIikKICAuYW5jaG9yKCJENSIpLnZvaWNpbmcoKQogIC5zZWdtZW50KDQpLmNsaXAocmFuZC5yYW5nZSguNCwuOCkpCiAgLnJvb20oLjc1KS5zaGFwZSguMykuZGVsYXkoLjI1KQogIC5mbShzaW5lLnJhbmdlKDMsOCkuc2xvdyg4KSkKICAubHBmKHNpbmUucmFuZ2UoNTAwLDEwMDApLnNsb3coOCkpLmxwcSg1KQogIC5yYXJlbHkocGx5KCIyIikpLmNodW5rKDQsIGZhc3QoMikpCiAgLmdhaW4ocGVybGluLnJhbmdlKC42LCAuOSkpCiAgLm1hc2soIjwwIDEgMSAwPi8xNiIpCikKLmxhdGUoIlswIC4wMV0qNCIpLmxhdGUoIlswIC4wMV0qMiIpLnNpemUoNCk%3D"></iframe>
+        </div>
+
+        <!-- 教學區塊 -->
+        <div class="section">
+          <h2>📚 Strudel 教學</h2>
+          <div class="tabs">
+            <button 
+              v-for="(tab, key) in tabs" 
+              :key="key"
+              class="tab" 
+              :class="{ active: activeTab === key }"
+              @click="activeTab = key"
+            >
+              {{ tab.title }}
+            </button>
+          </div>
+
+          <div v-for="(tab, key) in tabs" :key="key" class="tab-content" :class="{ active: activeTab === key }">
+            <h3>{{ tab.icon }} {{ tab.subtitle }}</h3>
+            
+            <!-- 基礎語法 -->
+            <div v-if="key === 'basics'" class="example-grid">
+              <div class="example-card" v-for="example in basicExamples" :key="example.title">
+                <h4>{{ example.title }}</h4>
+                <div class="code-block">{{ example.code }}</div>
+                <p>{{ example.description }}</p>
+                <button class="btn btn-primary" @click="playExample(example.jsCode)" :disabled="loading">
+                  {{ loading ? '載入中...' : '試聽' }}
+                </button>
+              </div>
+              
+              <!-- 完整範例 -->
+              <div class="example-card special-card">
+                <h4>🎵 完整音樂範例：Dub 風格</h4>
+                <div class="code-block">{{ dubExampleDisplay }}</div>
+                <p>四聲部編排：電吉他 + 鼓組 + 手風琴 + 貝斯，展現 Dub 音樂的經典特色</p>
+                <button class="btn" @click="playCompleteExample" :disabled="loading">
+                  🎧 {{ loading ? '載入中...' : '播放完整範例' }}
+                </button>
+              </div>
+            </div>
+
+            <!-- 音色介紹 -->
+            <div v-if="key === 'sounds'" class="sound-grid">
+              <div class="sound-card" v-for="sound in soundExamples" :key="sound.title">
+                <h4>{{ sound.title }}</h4>
+                <div v-for="item in sound.items" :key="item.name">
+                  <p><strong>{{ item.name }}</strong> - {{ item.description }}</p>
+                </div>
+                <button class="btn btn-secondary" @click="playExample(sound.jsCode)" :disabled="loading">
+                  {{ loading ? '載入中...' : '試聽' }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Pattern 技巧 -->
+            <div v-if="key === 'patterns'" class="example-grid">
+              <div class="example-card" v-for="pattern in patternExamples" :key="pattern.title">
+                <h4>{{ pattern.title }}</h4>
+                <div class="code-block">{{ pattern.code }}</div>
+                <p>{{ pattern.description }}</p>
+                <button class="btn btn-primary" @click="playExample(pattern.jsCode)" :disabled="loading">
+                  {{ loading ? '載入中...' : '試聽' }}
+                </button>
+              </div>
+            </div>
+
+            <!-- 效果器 -->
+            <div v-if="key === 'effects'">
+              <div class="example-grid">
+                <div class="example-card" v-for="effect in effectExamples" :key="effect.title">
+                  <h4>{{ effect.title }}</h4>
+                  <div class="code-block">{{ effect.code }}</div>
+                  <p>{{ effect.description }}</p>
+                  <button class="btn btn-primary" @click="playExample(effect.jsCode)" :disabled="loading">
+                    {{ loading ? '載入中...' : '試聽' }}
+                  </button>
+                </div>
+              </div>
+              
+              <div class="advanced-section">
+                <h4>🌊 進階：波形調制技巧</h4>
+                <p>Strudel 支援用波形來自動控制效果器參數：</p>
+                <ul style="margin: 15px 0; padding-left: 20px;">
+                  <li><strong>sine</strong> - 正弦波，平滑變化</li>
+                  <li><strong>saw</strong> - 鋸齒波，線性上升</li>
+                  <li><strong>square</strong> - 方波，突然跳躍</li>
+                  <li><strong>tri</strong> - 三角波，線性上下</li>
+                  <li><strong>rand</strong> - 隨機值</li>
+                  <li><strong>perlin</strong> - 平滑隨機</li>
+                </ul>
+                <div class="code-block">note("c2 c3").s("sawtooth").lpf(sine.range(100, 2000).slow(4))</div>
+                <button class="btn btn-secondary" @click="playWaveModulation" :disabled="loading">
+                  {{ loading ? '載入中...' : '試聽波形調制' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 自訂編輯器 -->
+        <div class="section">
+          <h2>🎹 自訂音樂編輯器</h2>
+          <p>在下方編輯器中寫你的 Strudel 程式碼，按下播放來聽聽效果！</p>
+          
+          <div class="editor-area">
+            <textarea 
+              v-model="customCode" 
+              class="custom-editor" 
+              placeholder="在這裡寫你的 Strudel 程式碼..."
+            ></textarea>
+          </div>
+
+          <div class="controls">
+            <button class="btn btn-primary" @click="playCustomCode" :disabled="loading">
+              ▶️ {{ loading ? '載入中...' : '播放我的音樂' }}
+            </button>
+            <button class="btn btn-secondary" @click="stopAll" :disabled="loading">
+              ⏹️ {{ loading ? '載入中...' : '停止播放' }}
+            </button>
+            <button class="btn btn-secondary" @click="clearEditor">
+              🗑️ 清空編輯器
+            </button>
+            <button class="btn btn-success" @click="loadDubExample">
+              📝 載入 Dub 範例
+            </button>
+          </div>
+        </div>
+
+        <!-- 內建編輯器 -->
+        <div class="section">
+          <h2>🔧 進階編輯器</h2>
+          <p>這是內建的 Strudel 編輯器，具有語法高亮功能：</p>
+          <strudel-editor>
+            <!--
+// 試試看修改這個範例
+setcps(1)
+stack(
+  s("bd*2 sd*2"),
+  s("hh*8").gain(0.4),
+  note("<c4 e4 g4 b4>*2").scale('C4 minor')
+  .s("sawtooth")
+  .clip(sine.range(.2,.8).slow(8))
+  .jux(rev)
+  .room(0.5)
+  .lpf(perlin.range(200,2000).slow(4))
+)
+-->
+          </strudel-editor>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const { createApp } = Vue;
+
+      createApp({
+        data() {
+          return {
+            isPlaying: false,
+            loading: false,
+            activeTab: 'basics',
+            customCode: `// 完整 Dub 音樂範例 (來自官方教學)
+stack(
+  // 悶音電吉他配延遲
+  note("[~ [<[d3,a3,f4]!2 [d3,bb3,g4]!2> ~]]*2")
+    .sound("gm_electric_guitar_muted")
+    .delay(.5),
+  
+  // 經典鼓組節奏配延遲
+  sound("bd rim")
+    .bank("RolandTR707")
+    .delay(.5),
+  
+  // 手風琴主旋律配空間感
+  n("<4 [3@3 4] [<2 0> ~@16] ~>")
+    .scale("D4:minor")
+    .sound("gm_accordion:2")
+    .room(2)
+    .gain(.4),
+  
+  // 雙波形貝斯配低通濾波
+  n("[0 [~ 0] 4 [3 2] [0 ~] [0 ~] <0 2> ~]/2")
+    .scale("D2:minor")
+    .sound("sawtooth,triangle")
+    .lpf(800)
+)`,
+            tabs: {
+              basics: { 
+                title: '基礎語法', 
+                icon: '🎯',
+                subtitle: '基礎語法'
+              },
+              sounds: { 
+                title: '音色介紹', 
+                icon: '🎵',
+                subtitle: '音色介紹'
+              },
+              patterns: { 
+                title: 'Pattern 技巧', 
+                icon: '🎨',
+                subtitle: 'Pattern 技巧'
+              },
+              effects: { 
+                title: '效果器', 
+                icon: '✨',
+                subtitle: '效果器'
+              }
+            },
+            basicExamples: [
+              {
+                title: '播放鼓聲',
+                code: 's("bd sd hh cp")',
+                description: 'bd=大鼓, sd=小鼓, hh=踩鈸, cp=拍手',
+                jsCode: 's("bd sd hh cp")'
+              },
+              {
+                title: '播放旋律',
+                code: 'note("c4 e4 g4 b4")',
+                description: '播放 C大調音階',
+                jsCode: 'note("c4 e4 g4 b4")'
+              },
+              {
+                title: '重複 Pattern',
+                code: 's("bd*4")',
+                description: '*4 表示重複 4 次',
+                jsCode: 's("bd*4")'
+              },
+              {
+                title: '疊加聲部',
+                code: 'stack(s("bd*2"), s("hh*4"))',
+                description: '同時播放多個 pattern',
+                jsCode: 'stack(s("bd*2"), s("hh*4"))'
+              }
+            ],
+            soundExamples: [
+              {
+                title: '鼓組 (Drums)',
+                items: [
+                  { name: 'bd', description: '大鼓/底鼓' },
+                  { name: 'sd', description: '小鼓' },
+                  { name: 'hh', description: '踩鈸' },
+                  { name: 'oh', description: '開放踩鈸' },
+                  { name: 'cp', description: '拍手聲' }
+                ],
+                jsCode: 's("bd sd hh oh cp")'
+              },
+              {
+                title: '合成器',
+                items: [
+                  { name: 'sawtooth', description: '鋸齒波' },
+                  { name: 'square', description: '方波' },
+                  { name: 'triangle', description: '三角波' },
+                  { name: 'sine', description: '正弦波' }
+                ],
+                jsCode: 'note("c4 e4 g4").sound("sawtooth")'
+              },
+              {
+                title: '真實樂器',
+                items: [
+                  { name: 'piano', description: '鋼琴' },
+                  { name: 'bass', description: '貝斯' },
+                  { name: 'guitar', description: '吉他' },
+                  { name: 'violin', description: '小提琴' }
+                ],
+                jsCode: 'note("c4 e4 g4").s("piano")'
+              }
+            ],
+            patternExamples: [
+              {
+                title: '輪替 Pattern',
+                code: 's("<bd sd>")',
+                description: '<> 表示輪流播放',
+                jsCode: 's("<bd sd>")'
+              },
+              {
+                title: '群組 Pattern',
+                code: 's("[bd sd] hh")',
+                description: '[] 表示群組，在一拍內播放',
+                jsCode: 's("[bd sd] hh")'
+              },
+              {
+                title: '休止符',
+                code: 's("bd ~ sd ~")',
+                description: '~ 表示休止符（靜音）',
+                jsCode: 's("bd ~ sd ~")'
+              },
+              {
+                title: 'Pattern 反轉',
+                code: 's("bd sd hh").jux(rev)',
+                description: 'jux(rev) 讓 pattern 反轉播放',
+                jsCode: 's("bd sd hh").jux(rev)'
+              }
+            ],
+            effectExamples: [
+              {
+                title: '低通濾波 (LPF)',
+                code: 'note("c2 c3 c2 c3").s("sawtooth").lpf(800)',
+                description: '過濾高頻，數值越小聲音越悶。試試 200 vs 2000',
+                jsCode: 'note("c2 c3 c2 c3").s("sawtooth").lpf(800)'
+              },
+              {
+                title: '動態音量 (Gain)',
+                code: 's("hh*16").gain("[.25 1]*2")',
+                description: '節奏的靈魂！動態音量創造律動感',
+                jsCode: 's("hh*16").gain("[.25 1]*2")'
+              },
+              {
+                title: '母音濾波 (Vowel)',
+                code: 'note("c3 eb3 g3").s("sawtooth").vowel("a e i o")',
+                description: '模擬人聲母音，創造有機感',
+                jsCode: 'note("c3 eb3 g3").s("sawtooth").vowel("a e i o")'
+              },
+              {
+                title: '延遲效果 (Delay)',
+                code: 's("bd rim").delay(".5:.125:.8")',
+                description: '格式：音量:時間:回授。創造回音效果',
+                jsCode: 's("bd rim").delay(".5:.125:.8")'
+              },
+              {
+                title: '空間殘響 (Room)',
+                code: 'note("c4 eb4 g4").s("piano").room(2)',
+                description: '模擬空間感，數值越大空間越大',
+                jsCode: 'note("c4 eb4 g4").s("piano").room(2)'
+              },
+              {
+                title: '聲道平移 (Pan)',
+                code: 's("bd rim bd cp").pan("0 0.3 .6 1")',
+                description: '0=左聲道，1=右聲道，0.5=中間',
+                jsCode: 's("bd rim bd cp").pan("0 0.3 .6 1")'
+              },
+              {
+                title: '播放速度 (Speed)',
+                code: 's("bd rim bd cp").speed("1 2 -1 -2")',
+                description: '負數=倒播，2=雙倍速，0.5=半速',
+                jsCode: 's("bd rim bd cp").speed("1 2 -1 -2")'
+              },
+              {
+                title: 'ADSR 包絡',
+                code: 'note("c3").s("sawtooth").adsr(".1:.1:.5:.2")',
+                description: '格式：起音:衰減:延音:釋音',
+                jsCode: 'note("c3 bb2 f3 eb3").s("sawtooth").adsr(".1:.1:.5:.2")'
+              },
+              {
+                title: '波形調制 (Signals)',
+                code: 's("hh*16").lpf(sine.range(500, 2000))',
+                description: '用 sine, saw, square, tri 波形調制參數',
+                jsCode: 's("hh*16").lpf(sine.range(500, 2000))'
+              }
+            ],
+            dubExampleDisplay: `stack(
+  note("[~ [<[d3,a3,f4]!2 [d3,bb3,g4]!2> ~]]*2").sound("gm_electric_guitar_muted").delay(.5),
+  sound("bd rim").bank("RolandTR707").delay(.5),
+  n("<4 [3@3 4] [<2 0> ~@16] ~>").scale("D4:minor").sound("gm_accordion:2").room(2),
+  n("[0 [~ 0] 4 [3 2] [0 ~] [0 ~] <0 2> ~]/2").scale("D2:minor").sound("sawtooth,triangle").lpf(800)
+)`
+          }
+        },
+        mounted() {
+          // 初始化 Strudel
+          initStrudel();
+          console.log('🎵 Strudel Vue 教學網站已啟動！');
+        },
+        methods: {
+          async playExample(code) {
+            this.loading = true;
+            try {
+              hush(); // 先停止之前的音樂
+              await new Promise(resolve => setTimeout(resolve, 100));
+              evaluate(code);
+              this.isPlaying = true;
+            } catch (error) {
+              alert('播放錯誤：' + error.message);
+            } finally {
+              this.loading = false;
+            }
+          },
+          
+          async playCompleteExample() {
+            this.loading = true;
+            try {
+              hush();
+              await new Promise(resolve => setTimeout(resolve, 100));
+              evaluate(`
+                stack(
+                  note("[~ [<[d3,a3,f4]!2 [d3,bb3,g4]!2> ~]]*2")
+                    .sound("gm_electric_guitar_muted")
+                    .delay(.5),
+                  sound("bd rim")
+                    .bank("RolandTR707")
+                    .delay(.5),
+                  n("<4 [3@3 4] [<2 0> ~@16] ~>")
+                    .scale("D4:minor")
+                    .sound("gm_accordion:2")
+                    .room(2)
+                    .gain(.4),
+                  n("[0 [~ 0] 4 [3 2] [0 ~] [0 ~] <0 2> ~]/2")
+                    .scale("D2:minor")
+                    .sound("sawtooth,triangle")
+                    .lpf(800)
+                )
+              `);
+              this.isPlaying = true;
+            } catch (error) {
+              alert('播放錯誤：' + error.message);
+            } finally {
+              this.loading = false;
+            }
+          },
+          
+          async playWaveModulation() {
+            this.loading = true;
+            try {
+              hush();
+              await new Promise(resolve => setTimeout(resolve, 100));
+              evaluate('note("c2 c3 c2 c3").s("sawtooth").lpf(sine.range(100, 2000).slow(4))');
+              this.isPlaying = true;
+            } catch (error) {
+              alert('播放錯誤：' + error.message);
+            } finally {
+              this.loading = false;
+            }
+          },
+          
+          async playCustomCode() {
+            this.loading = true;
+            try {
+              evaluate(this.customCode);
+              this.isPlaying = true;
+            } catch (error) {
+              alert('程式碼有錯誤：' + error.message);
+            } finally {
+              this.loading = false;
+            }
+          },
+          
+          async stopAll() {
+            this.loading = true;
+            try {
+              hush();
+              this.isPlaying = false;
+            } catch (error) {
+              alert('停止錯誤：' + error.message);
+            } finally {
+              this.loading = false;
+            }
+          },
+          
+          clearEditor() {
+            this.customCode = '';
+          },
+          
+          loadDubExample() {
+            this.customCode = `// 完整 Dub 音樂範例 (來自官方教學)
+stack(
+  // 悶音電吉他配延遲
+  note("[~ [<[d3,a3,f4]!2 [d3,bb3,g4]!2> ~]]*2")
+    .sound("gm_electric_guitar_muted")
+    .delay(.5),
+  
+  // 經典鼓組節奏配延遲
+  sound("bd rim")
+    .bank("RolandTR707")
+    .delay(.5),
+  
+  // 手風琴主旋律配空間感
+  n("<4 [3@3 4] [<2 0> ~@16] ~>")
+    .scale("D4:minor")
+    .sound("gm_accordion:2")
+    .room(2)
+    .gain(.4),
+  
+  // 雙波形貝斯配低通濾波
+  n("[0 [~ 0] 4 [3 2] [0 ~] [0 ~] <0 2> ~]/2")
+    .scale("D2:minor")
+    .sound("sawtooth,triangle")
+    .lpf(800)
+)`;
+          }
+        }
+      }).mount('#app');
+    </script>
+  </body>
+</html> 

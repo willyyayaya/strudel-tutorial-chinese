@@ -16,7 +16,8 @@
 ## 🚀 快速開始
 
 ### 線上體驗
-直接開啟 `demo.html` 即可在瀏覽器中體驗完整的教學內容。
+- **Vue 版本**：開啟 `vue-demo.html` 體驗現代化的 Vue.js 介面 (推薦)
+- **原始版本**：開啟 `demo.html` 體驗基礎版本
 
 ### 本地運行
 ```bash
@@ -64,6 +65,13 @@ open demo.html
 
 ## 🛠️ 技術架構
 
+### Vue 版本 (推薦)
+- **前端框架**：Vue.js 3 (CDN)
+- **音樂引擎**：Strudel Web (`@strudel/web@1.2.3`)
+- **編輯器**：Strudel REPL (`@strudel/repl@latest`)
+- **UI 設計**：響應式設計，組件化架構，更好的互動性
+
+### 原始版本
 - **前端框架**：原生 HTML/CSS/JavaScript
 - **音樂引擎**：Strudel Web (`@strudel/web@1.0.3`)
 - **編輯器**：Strudel REPL (`@strudel/repl@latest`)
@@ -73,7 +81,8 @@ open demo.html
 
 ```
 strudel-tutorial-zh/
-├── demo.html          # 主要教學頁面
+├── vue-demo.html      # Vue.js 版本教學頁面 (推薦)
+├── demo.html          # 原始版本教學頁面
 ├── demo.js            # JavaScript 初始化腳本
 ├── music.html         # 簡單音樂範例頁面
 ├── DJ_Dave.str        # 進階 Strudel 作品範例
@@ -150,6 +159,14 @@ stack(
 
 ## 🌟 特色功能
 
+### Vue 版本新特色
+- **現代化介面**：Vue.js 3 組件化架構，更流暢的使用體驗
+- **即時狀態顯示**：播放/停止狀態指示器
+- **載入狀態管理**：防止重複點擊，提供視覺回饋
+- **智能按鈕控制**：自動禁用/啟用按鈕，避免操作衝突
+- **分頁式學習**：清晰的分頁切換，動畫效果更佳
+
+### 共同特色
 - **互動式學習**：每個範例都可以直接點擊試聽
 - **雙編輯器**：提供簡單和進階兩種編輯器
 - **即時預覽**：修改程式碼後立即聽到效果
